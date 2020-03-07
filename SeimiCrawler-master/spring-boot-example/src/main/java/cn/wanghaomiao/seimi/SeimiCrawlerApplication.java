@@ -57,8 +57,8 @@ public class SeimiCrawlerApplication {
         //输出时间格式
         private final SimpleDateFormat format = new SimpleDateFormat("HH(hh):mm:ss S");
 
-        /* 第二步 五分钟*/
-        @Scheduled(initialDelay = 300000, fixedRate = 300000)
+        /* 第3步 五分钟*/
+        @Scheduled(initialDelay = 60000, fixedRate = 60000)
         public void threeScheduledTasks() throws Exception {
             System.out.println("定时任务执行，现在时间是 : " + format.format(new Date()));
             List<String> secondUrl2Three = IOUtils.readLines(new FileInputStream(new File(SECONDURL)));
@@ -68,7 +68,7 @@ public class SeimiCrawlerApplication {
         }
 
         /* 第二步 一分钟*/
-        @Scheduled(initialDelay = 60000, fixedRate = 60000)
+        @Scheduled(initialDelay = 300000, fixedRate = 300000)
         public void secondScheduledTasks() throws Exception {
             System.out.println("定时任务执行，现在时间是 : " + format.format(new Date()));
             List<String> firstUrl2Second = IOUtils.readLines(new FileInputStream(new File(FIRSTURL)));
@@ -116,6 +116,7 @@ public class SeimiCrawlerApplication {
         ArrayList<String> utlList = new ArrayList<>();
         for (int i = firstNum; i <= firstNum; i++) {
             String url = BASEURL + i;
+            logg.info("第一步添加到第二步执行的url " + url);
             utlList.add(url);
         }
 
@@ -130,10 +131,23 @@ public class SeimiCrawlerApplication {
     }
 
     public static void pachong_page(List<String> utlList) throws Exception {
+        if (!CollectionUtils.isEmpty(utlList)) {
+            FileOutputStream fout = null;
+            try {
+                File file = new File(SECONDURL);
+                fout = new FileOutputStream(file);
+                FileUtils.deleteQuietly(file);
+                file = new File(SECONDURL);
+                IOUtils.writeLines(new ArrayList<>(0), null, fout);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         List<Elements> elementsList = new ArrayList<>();
         Iterator<String> iterator = utlList.iterator();
         while (iterator.hasNext()) {
             String url = iterator.next();
+            logg.info("第二步入参网址 ={}" , url);
             Document doc = null;
             try {
                 //模拟火狐浏览器
@@ -161,7 +175,7 @@ public class SeimiCrawlerApplication {
                 //高清图url
                 String aurl = element.select("a").attr("abs:href");
                 urls.add(aurl);
-                logg.info("网址集合的尺寸 = " + urls.size());
+                logg.info("第二步子节点 网址集合的尺寸 ={},当前子节点网址是 " , urls.size(),aurl);
             });
         });
 
@@ -173,39 +187,29 @@ public class SeimiCrawlerApplication {
             e.printStackTrace();
         }
         logg.info("第二步执行完毕 = " + urls.size());
-        //获取列表总数
-//		int result = tr.size();
-//
-//		for (int i = 1; i < tr.size(); i++) {
-//			Element element = tr.get(i - 1);
-//            try {
-//                Thread.sleep(1000);//让线程操作不要太快 1秒一次 时间自己设置，主要是模拟人在点击
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
-        //高清图url
-//			String aurl = element.select("a").attr("abs:href");
-//			urls.add(aurl);
-//			System.out.println("网址集合的尺寸 = " + urls.size());
-        //缩略图url
-//            String imgSrc = element.getElementsByTag("amp-img").attr("src");
-//            System.out.println("imgSrc = " + imgSrc);
-//            String title = element.getElementsByTag("amp-img").attr("alt");
-//            System.out.println(title);
-//            File file = new File("E:\\test2\\" + title + ".jpg");
-//            X509TrustUtiil.downloadFile(imgSrc, file, null);
-//		}
-//        getMoore(urls);
     }
 
 
     public static void getMoore(List<String> urls) throws Exception {
+        if (!CollectionUtils.isEmpty(urls)) {
+            FileOutputStream fout = null;
+            try {
+                File file = new File(SECONDURL);
+                fout = new FileOutputStream(file);
+                FileUtils.deleteQuietly(file);
+                file = new File(SECONDURL);
+                IOUtils.writeLines(new ArrayList<>(0), null, fout);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         Iterator<String> iterator = urls.iterator();
         boolean sync = true;
         while (iterator.hasNext() && sync) {
             sync = false;
             String url = iterator.next();
+            logg.info("第三步入参网址 ={}" , url);
             Document doc = null;
             try {
                 //模拟火狐浏览器
@@ -225,10 +229,9 @@ public class SeimiCrawlerApplication {
                     div.stream().filter(element -> !StringUtils.isBlank(element.select("div").get(1).getElementsByTag("amp-img").attr("src")))
                             .forEach(element -> {
                                 String imgSrc = element.select("div").get(1).getElementsByTag("amp-img").attr("src");
-                                System.out.println("imgSrc = " + imgSrc);
+                                logg.info("第三步子节点执行网址:{}",imgSrc);
                                 String title = element.select("div").get(1).getElementsByTag("amp-img").attr("alt");
-
-                                System.out.println(title);
+                                logg.info("第三步子节点执行标题:{}",title);
                                 File file = new File("E:\\test2\\" + title + ".jpg");
                                 workersPool.execute(new Runnable() {
                                     @Override
