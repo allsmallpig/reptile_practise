@@ -60,25 +60,25 @@ public class SeimiCrawlerApplication {
         /* 第3步 五分钟*/
         @Scheduled(initialDelay = 60000, fixedRate = 60000)
         public void threeScheduledTasks() throws Exception {
-            System.out.println("定时任务执行，现在时间是 : " + format.format(new Date()));
             List<String> secondUrl2Three = IOUtils.readLines(new FileInputStream(new File(SECONDURL)));
             if (!CollectionUtils.isEmpty(secondUrl2Three)) {
+                logg.info("第 三 步开始执行，现在时间是 : " + format.format(new Date()));
                 getMoore(secondUrl2Three);
             }
         }
 
         /* 第二步 一分钟*/
-        @Scheduled(initialDelay = 300000, fixedRate = 300000)
+        @Scheduled(initialDelay = 180000, fixedRate = 180000)
         public void secondScheduledTasks() throws Exception {
-            System.out.println("定时任务执行，现在时间是 : " + format.format(new Date()));
             List<String> firstUrl2Second = IOUtils.readLines(new FileInputStream(new File(FIRSTURL)));
             if (!CollectionUtils.isEmpty(firstUrl2Second)) {
+                logg.info("第 二 步开始执行，现在时间是 : " + format.format(new Date()));
                 pachong_page(firstUrl2Second);
             }
         }
 
         /* 第一步 十分钟*/
-        @Scheduled(initialDelay = 5000, fixedRate = 600000)
+        @Scheduled(initialDelay = 320000, fixedRate = 320000)
         public void firstScheduledTasks() {
             try {
                 pachongFrist();
@@ -134,10 +134,10 @@ public class SeimiCrawlerApplication {
         if (!CollectionUtils.isEmpty(utlList)) {
             FileOutputStream fout = null;
             try {
-                File file = new File(SECONDURL);
+                File file = new File(FIRSTURL);
                 fout = new FileOutputStream(file);
                 FileUtils.deleteQuietly(file);
-                file = new File(SECONDURL);
+                file = new File(FIRSTURL);
                 IOUtils.writeLines(new ArrayList<>(0), null, fout);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -147,7 +147,7 @@ public class SeimiCrawlerApplication {
         Iterator<String> iterator = utlList.iterator();
         while (iterator.hasNext()) {
             String url = iterator.next();
-            logg.info("第二步入参网址 ={}" , url);
+            logg.info("第二步入参网址 ={}", url);
             Document doc = null;
             try {
                 //模拟火狐浏览器
@@ -175,7 +175,7 @@ public class SeimiCrawlerApplication {
                 //高清图url
                 String aurl = element.select("a").attr("abs:href");
                 urls.add(aurl);
-                logg.info("第二步子节点 网址集合的尺寸 ={},当前子节点网址是 " , urls.size(),aurl);
+                logg.info("第二步子节点 网址集合的尺寸 ={},当前子节点网址是 ", urls.size(), aurl);
             });
         });
 
@@ -209,7 +209,7 @@ public class SeimiCrawlerApplication {
         while (iterator.hasNext() && sync) {
             sync = false;
             String url = iterator.next();
-            logg.info("第三步入参网址 ={}" , url);
+            logg.info("第三步入参网址 ={}", url);
             Document doc = null;
             try {
                 //模拟火狐浏览器
@@ -229,9 +229,9 @@ public class SeimiCrawlerApplication {
                     div.stream().filter(element -> !StringUtils.isBlank(element.select("div").get(1).getElementsByTag("amp-img").attr("src")))
                             .forEach(element -> {
                                 String imgSrc = element.select("div").get(1).getElementsByTag("amp-img").attr("src");
-                                logg.info("第三步子节点执行网址:{}",imgSrc);
+                                logg.info("第三步子节点执行网址:{}", imgSrc);
                                 String title = element.select("div").get(1).getElementsByTag("amp-img").attr("alt");
-                                logg.info("第三步子节点执行标题:{}",title);
+                                logg.info("第三步子节点执行标题:{}", title);
                                 File file = new File("E:\\test2\\" + title + ".jpg");
                                 workersPool.execute(new Runnable() {
                                     @Override
