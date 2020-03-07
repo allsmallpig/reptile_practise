@@ -68,7 +68,7 @@ public class SeimiCrawlerApplication {
         }
 
         /* 第二步 一分钟*/
-        @Scheduled(initialDelay = 180000, fixedRate = 180000)
+        @Scheduled(initialDelay = 80000, fixedRate = 80000)
         public void secondScheduledTasks() throws Exception {
             List<String> firstUrl2Second = IOUtils.readLines(new FileInputStream(new File(FIRSTURL)));
             if (!CollectionUtils.isEmpty(firstUrl2Second)) {
@@ -78,7 +78,7 @@ public class SeimiCrawlerApplication {
         }
 
         /* 第一步 十分钟*/
-        @Scheduled(initialDelay = 320000, fixedRate = 320000)
+        @Scheduled(initialDelay = 100000, fixedRate = 100000)
         public void firstScheduledTasks() {
             try {
                 pachongFrist();
@@ -175,7 +175,7 @@ public class SeimiCrawlerApplication {
                 //高清图url
                 String aurl = element.select("a").attr("abs:href");
                 urls.add(aurl);
-                logg.info("第二步子节点 网址集合的尺寸 ={},当前子节点网址是 ", urls.size(), aurl);
+                logg.info("第二步子节点 网址集合的尺寸 ={},当前子节点网址是 {}", urls.size(), aurl);
             });
         });
 
