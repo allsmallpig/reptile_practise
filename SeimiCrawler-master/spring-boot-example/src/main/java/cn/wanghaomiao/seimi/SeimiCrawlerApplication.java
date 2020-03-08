@@ -34,11 +34,16 @@ import java.util.stream.Stream;
 public class SeimiCrawlerApplication {
     static ThreadPoolExecutor workersPool;
     static Logger logg = LoggerFactory.getLogger(SeimiCrawlerApplication.class);
+    //TODO start  在你需要的盘里面  创建 这几个文件 和目录
     public static final String FIRSTURL = "E:\\firstPicUrl.txt";
     public static final String SECONDURL = "E:\\secondPicUrl.txt";
     public static final String NUMFILE = "E:\\numUrl.txt";
+    public static final String teragetFilepath= "E:\\test2\\";
+    //TODO end
+
     public static final String BASEURL = "https://qingbuyaohaixiu.com/?page=";
     public static boolean BOROKEN_FLAG = false;
+
 
     static {
         LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
@@ -258,7 +263,7 @@ public class SeimiCrawlerApplication {
                                 logg.info("第三步子节点执行网址:{}", imgSrc);
                                 String title = element.select("div").get(1).getElementsByTag("amp-img").attr("alt");
                                 logg.info("第三步子节点执行标题:{}", title);
-                                File file = new File("E:\\test2\\" + title + ".jpg");
+                                File file = new File(teragetFilepath + title + ".jpg");
                                 workersPool.execute(new Runnable() {
                                     @Override
                                     public void run() {
