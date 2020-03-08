@@ -36,6 +36,7 @@ public class SeimiCrawlerApplication {
     public static final String SECONDURL = "E:\\secondPicUrl.txt";
     public static final String NUMFILE = "E:\\numUrl.txt";
     public static final String BASEURL = "https://qingbuyaohaixiu.com/?page=";
+    public static boolean BOROKEN_FLAG = false;
 
     static {
         LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
@@ -53,42 +54,55 @@ public class SeimiCrawlerApplication {
 
     @Component
     public class ScheduledTasks {
-
-        //输出时间格式
         private final SimpleDateFormat format = new SimpleDateFormat("HH(hh):mm:ss S");
-
         /* 第3步 五分钟*/
         @Scheduled(initialDelay = 60000, fixedRate = 60000)
-        public void threeScheduledTasks() throws Exception {
-            List<String> secondUrl2Three = IOUtils.readLines(new FileInputStream(new File(SECONDURL)));
-            if (!CollectionUtils.isEmpty(secondUrl2Three)) {
-                logg.info("第 三 步开始执行，现在时间是 : " + format.format(new Date()));
-                getMoore(secondUrl2Three);
+        public void threeScheduledTasks() {
+            if (!BOROKEN_FLAG) {
+                try {
+                    List<String> secondUrl2Three = IOUtils.readLines(new FileInputStream(new File(SECONDURL)));
+                    if (!CollectionUtils.isEmpty(secondUrl2Three)) {
+                        logg.info("第 三 步开始执行，现在时间是 : " + format.format(new Date()));
+                        getMoore(secondUrl2Three);
+                    }
+                } catch (Exception e) {
+                    BOROKEN_FLAG = true;
+                    e.printStackTrace();
+                }
             }
         }
 
         /* 第二步 一分钟*/
         @Scheduled(initialDelay = 80000, fixedRate = 80000)
-        public void secondScheduledTasks() throws Exception {
-            List<String> firstUrl2Second = IOUtils.readLines(new FileInputStream(new File(FIRSTURL)));
-            if (!CollectionUtils.isEmpty(firstUrl2Second)) {
-                logg.info("第 二 步开始执行，现在时间是 : " + format.format(new Date()));
-                pachong_page(firstUrl2Second);
+        public void secondScheduledTasks() {
+            if (!BOROKEN_FLAG) {
+                try {
+                    List<String> firstUrl2Second = IOUtils.readLines(new FileInputStream(new File(FIRSTURL)));
+                    if (!CollectionUtils.isEmpty(firstUrl2Second)) {
+                        logg.info("第 二 步开始执行，现在时间是 : " + format.format(new Date()));
+                        pachong_page(firstUrl2Second);
+                    }
+                } catch (Exception e) {
+                    BOROKEN_FLAG = true;
+                    e.printStackTrace();
+                }
             }
         }
 
         /* 第一步 十分钟*/
         @Scheduled(initialDelay = 100000, fixedRate = 100000)
         public void firstScheduledTasks() {
-            try {
-                pachongFrist();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!BOROKEN_FLAG) {
+                try {
+                    pachongFrist();
+                } catch (Exception e) {
+                    BOROKEN_FLAG = true;
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    //支持分页爬取
     public static void pachongFrist() throws Exception {
         File file = new File(NUMFILE);
         List<String> numList = IOUtils.readLines(new FileInputStream(file));
@@ -221,8 +235,6 @@ public class SeimiCrawlerApplication {
                 continue;
             }
             if (null != doc) {
-                long startTime = System.currentTimeMillis();
-                System.out.println("startTime = " + startTime);
                 //这里根据在网页中分析的类选择器来获取电影列表所在的节点
                 Elements div = doc.getElementsByClass("rr");
                 if (null != div) {
