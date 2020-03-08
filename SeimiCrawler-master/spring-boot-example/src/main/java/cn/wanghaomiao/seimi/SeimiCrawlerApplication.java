@@ -26,6 +26,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 @EnableScheduling
@@ -122,6 +124,18 @@ public class SeimiCrawlerApplication {
                 FileUtils.deleteQuietly(file);
                 file = new File(NUMFILE);
                 IOUtils.writeLines(numList, null, fout);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            // 生成1-244 页码 根据需要调整
+            List<Integer> list = Stream.iterate(1, item -> item+1).limit(244).collect(Collectors.toList());
+            firstNum = Integer.valueOf(list.get(0));
+            list.remove(0);
+            FileOutputStream fout = null;
+            try {
+                fout = new FileOutputStream(file);
+                IOUtils.writeLines(list, null, fout);
             } catch (IOException e) {
                 e.printStackTrace();
             }
